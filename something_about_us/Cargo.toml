@@ -1,0 +1,55 @@
+[package]
+name = "something_about_us"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# runtime
+tokio = { version = "1.46.1", features = ["full"] }
+
+# client
+async-memcached = "0.5.0"
+deadpool = { version = "0.12.2", features = ["rt_tokio_1"] }
+deadpool-memcached = "0.3.2"
+sea-orm = { version = "1.1.0", features = [
+    "sqlx-postgres",
+    "runtime-tokio-rustls",
+    "macros",
+    "with-uuid",
+    "with-chrono",
+    "with-json",
+] }
+
+# logger
+tracing = "0.1.41"
+tracing-subscriber = "0.3.19"
+
+# error
+thiserror = "2.0.12"
+anyhow = "1.0.98"
+
+# http
+axum = "0.8.4"
+axum-extra = { version = "0.10.1", features = ["cookie"] }
+utoipa = { version = "5.4.0", features = ["axum_extras", "uuid", "chrono"] }
+utoipa-swagger-ui = { version = "9.0.2", features = ["axum"] }
+cookie = "0.18.1"
+reqwest = { version = "0.12.22", features = ["json"] }
+openidconnect = "4.0.1"
+oauth2 = "5.0.0"
+
+# format
+jsonwebtoken = "9.3.1"
+sonic-rs = "0.5.3"
+serde = { version = "1.0.219", features = ["derive"] }
+uuid = { version = "1.17.0", features = ["v7", "serde"] }
+toml = "0.9.2"
+url = "2.5.4"
+base64 = "0.22.1"
+chrono = "0.4.41"
+pem = "3.0.5"
+ring = "0.17.14"
+
+[dev-dependencies]
+# test
+tempfile = "3.20.0"
