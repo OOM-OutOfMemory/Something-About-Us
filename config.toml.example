@@ -1,0 +1,102 @@
+[server]
+domain = "http://127.0.0.1"
+port = 3000
+user_agent = "AllForOne/0.1.0"
+
+[logger]
+level = "debug"
+
+[memcached]
+[memcached.connect_info]
+address = "127.0.0.1"
+port = 11211
+[memcached.runtime_options]
+init_flush = false
+pool_size = 10
+read_timeout = 60
+write_timeout = 60
+
+[postgres]
+[postgres.connect_info]
+address = "127.0.0.1"
+port = 5432
+username = "user_database"
+password = "user_database"
+db_name = "my_users"
+[postgres.runtime_options]
+max_pool_size = 10
+min_pool_size = 5
+connect_timeout = 8
+acquire_timeout = 8
+idle_timeout = 8
+max_lifetime = 8
+sqlx_logging = true
+log_level = "debug"
+
+# only EdDSA keys are supported
+# only pkce8 format supported
+[jwks]
+iss = "https://auth.example.com"
+aud = "AllForOne-Project-Service"
+keys_path = "./jwks"
+
+# if kid's key not exist, it will be generated automatically
+[[jwks.keys]]
+kid = "13f03b9f-f209-4dcd-86f0-69cc19e773eb"
+
+[oidc]
+[oidc.github]
+client_id = "fg8dh798dh79dh78"
+client_secret = "fd8976h8df6h7f98dh798df7h98dfh79dfh8"
+resource_url = "https://api.github.com"
+auth_url = "https://github.com/login/oauth/authorize"
+token_url = "https://github.com/login/oauth/access_token"
+
+# Security Configuration
+[security]
+
+# JWT Security Settings
+[security.jwt]
+access_token_ttl = 900          # 15 minutes in seconds
+
+# refresh token and rotate not suopported yet
+refresh_token_ttl = 86400       # 24 hours in seconds
+key_rotation_interval = 2592000 # 30 days in seconds
+
+# only EdDSA keys are supported
+algorithm = "EdDSA"
+
+# Session Security Settings
+[security.session]
+cookie_ttl = 300      # 5 minutes in seconds
+cache_ttl = 600       # 10 minutes in seconds
+secure_cookies = true
+same_site = "Lax"
+http_only = true
+
+# Rate Limiting Settings
+# not supported yet
+[security.rate_limiting]
+enabled = true
+requests_per_minute = 60
+burst_size = 10
+cleanup_interval = 300   # 5 minutes in seconds
+
+# CORS Settings
+# not supported yet
+[security.cors]
+enabled = true
+allowed_origins = ["https://example.com", "https://app.example.com"]
+allowed_methods = ["GET", "POST", "OPTIONS"]
+allowed_headers = ["Content-Type", "Authorization"]
+max_age = 3600
+
+# Security Headers Settings
+# not supported yet
+[security.security_headers]
+hsts_enabled = true
+hsts_max_age = 31536000                                                                                # 1 year
+csp_enabled = true
+csp_policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
+x_frame_options = "DENY"
+x_content_type_options = true
