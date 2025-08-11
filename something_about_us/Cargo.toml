@@ -1,7 +1,13 @@
 [package]
 name = "something_about_us"
 version = "0.1.0"
-edition = "2024"
+edition = "2021"
+
+[[bin]]
+name = "something_about_us"
+
+[features]
+default = []
 
 [dependencies]
 # runtime

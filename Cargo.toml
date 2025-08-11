@@ -1,0 +1,4 @@
+[workspace]
+resolver = "2"
+members = ["migration", "something_about_us"]
+default-members = ["something_about_us"]
