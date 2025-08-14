@@ -12,6 +12,7 @@ default = []
 [dependencies]
 # runtime
 tokio = { version = "1.46.1", features = ["full"] }
+async-trait = "0.1.88"
 
 # client
 async-memcached = "0.5.0"
