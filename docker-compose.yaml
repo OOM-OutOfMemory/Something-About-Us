@@ -1,0 +1,44 @@
+services:
+  something-about-us:
+    image: something-about-us:latest
+    build:
+      context: .
+      dockerfile: dockerfile
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 128M
+    ports:
+      - "3000:3000"
+    depends_on:
+      - memcached
+      - postgres
+
+  memcached:
+    image: memcached:alpine
+    command:
+      - --conn-limit=1000
+      - --memory-limit=64
+      - --threads=1
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 128M
+    ports:
+      - "11211:11211"
+
+  postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: user_database
+      POSTGRES_PASSWORD: user_database
+      POSTGRES_DB: my_users
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 256M
+    ports:
+      - "5432:5432"
