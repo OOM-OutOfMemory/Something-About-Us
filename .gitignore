@@ -4,3 +4,4 @@
 
 .env
 config.toml
+test_config.toml
