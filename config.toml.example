@@ -13,8 +13,6 @@ port = 11211
 [memcached.runtime_options]
 init_flush = false
 pool_size = 10
-read_timeout = 60
-write_timeout = 60
 
 [postgres]
 [postgres.connect_info]
@@ -58,6 +56,8 @@ token_url = "https://github.com/login/oauth/access_token"
 # JWT Security Settings
 [security.jwt]
 access_token_ttl = 900          # 15 minutes in seconds
+aud = "AllForOne-Project-Service"
+issuer = "https://auth.example.com"
 
 # refresh token and rotate not suopported yet
 refresh_token_ttl = 86400       # 24 hours in seconds
@@ -69,34 +69,7 @@ algorithm = "EdDSA"
 # Session Security Settings
 [security.session]
 cookie_ttl = 300      # 5 minutes in seconds
-cache_ttl = 600       # 10 minutes in seconds
 secure_cookies = true
 same_site = "Lax"
 http_only = true
-
-# Rate Limiting Settings
-# not supported yet
-[security.rate_limiting]
-enabled = true
-requests_per_minute = 60
-burst_size = 10
-cleanup_interval = 300   # 5 minutes in seconds
-
-# CORS Settings
-# not supported yet
-[security.cors]
-enabled = true
-allowed_origins = ["https://example.com", "https://app.example.com"]
-allowed_methods = ["GET", "POST", "OPTIONS"]
-allowed_headers = ["Content-Type", "Authorization"]
-max_age = 3600
-
-# Security Headers Settings
-# not supported yet
-[security.security_headers]
-hsts_enabled = true
-hsts_max_age = 31536000                                                                                # 1 year
-csp_enabled = true
-csp_policy = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'"
-x_frame_options = "DENY"
-x_content_type_options = true
+redirect_url = "http://127.0.0.1:3000/api/v1/oauth/github/callback"

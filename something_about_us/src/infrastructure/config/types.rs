@@ -1,4 +1,5 @@
 use sonic_rs::Deserialize;
+use url::Url;
 use uuid::Uuid;
 
 #[derive(Deserialize, Debug)]
@@ -95,12 +96,12 @@ pub struct GithubConfig {
     pub resource_url: String,
     pub auth_url: String,
     pub token_url: String,
+    pub redirect_url: Url,
 }
 
 #[derive(Deserialize, Debug)]
 pub struct SecurityConfig {
     pub session: SessionSecurityConfig,
-    pub security_headers: SecurityHeadersConfig,
 }
 
 #[derive(Deserialize, Debug, Clone)]
@@ -109,14 +110,4 @@ pub struct SessionSecurityConfig {
     pub secure_cookies: bool,
     pub same_site: String,
     pub http_only: bool,
-}
-
-#[derive(Deserialize, Debug)]
-pub struct SecurityHeadersConfig {
-    pub hsts_enabled: bool,
-    pub hsts_max_age: u64,
-    pub csp_enabled: bool,
-    pub csp_policy: String,
-    pub x_frame_options: String,
-    pub x_content_type_options: bool,
 }
