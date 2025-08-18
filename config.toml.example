@@ -49,6 +49,7 @@ client_secret = "fd8976h8df6h7f98dh798df7h98dfh79dfh8"
 resource_url = "https://api.github.com"
 auth_url = "https://github.com/login/oauth/authorize"
 token_url = "https://github.com/login/oauth/access_token"
+redirect_url = "http://127.0.0.1:3000/api/v1/oauth/github/callback"
 
 # Security Configuration
 [security]
@@ -72,4 +73,3 @@ cookie_ttl = 300      # 5 minutes in seconds
 secure_cookies = true
 same_site = "Lax"
 http_only = true
-redirect_url = "http://127.0.0.1:3000/api/v1/oauth/github/callback"
