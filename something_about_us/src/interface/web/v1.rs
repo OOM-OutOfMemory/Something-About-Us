@@ -6,6 +6,8 @@ pub mod health;
 pub mod jwks;
 pub mod oauth;
 
+pub mod health_test;
+
 pub async fn router(state: AppState) -> Router {
     Router::new().nest(
         "/v1",

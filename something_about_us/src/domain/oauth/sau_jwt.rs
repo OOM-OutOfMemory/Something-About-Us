@@ -14,3 +14,8 @@ pub struct SAUClaims {
     pub iat: i64,
     pub nbf: i64,
 }
+
+#[cfg(test)]
+mod tests {
+    include!("sau_jwt_test.rs");
+}

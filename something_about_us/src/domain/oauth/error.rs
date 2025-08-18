@@ -23,3 +23,8 @@ pub enum SAUOAuthDomainError {
     #[error("jwt issue failed: {0}")]
     JwtIssueFailed(String),
 }
+
+#[cfg(test)]
+mod tests {
+    include!("error_test.rs");
+}

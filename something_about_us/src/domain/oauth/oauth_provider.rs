@@ -17,3 +17,8 @@ pub trait OAuthRequest: Send + Sync {
         access_token: OAuthAccessToken,
     ) -> Result<String, SAUOAuthDomainError>;
 }
+
+#[cfg(test)]
+mod tests {
+    include!("oauth_provider_test.rs");
+}

@@ -62,3 +62,10 @@ pub trait JwtIssue {
     fn issue_with_id(&self, kid: &Uuid, uid: &Uuid) -> Result<SAUJwt, SAUOAuthDomainError>;
     fn create_jwks(&self) -> JwkSet;
 }
+
+// JwtIssue implementation is provided in infrastructure/auth/jwt_issuer_helper.rs
+
+#[cfg(test)]
+mod tests {
+    include!("sau_jwt_issuer_test.rs");
+}
