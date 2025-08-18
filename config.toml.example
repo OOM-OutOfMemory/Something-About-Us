@@ -1,7 +1,7 @@
 [server]
 domain = "http://127.0.0.1"
 port = 3000
-user_agent = "AllForOne/0.1.0"
+user_agent = "SomethingAboutUs/0.1.0"
 
 [logger]
 level = "debug"
@@ -33,19 +33,18 @@ log_level = "debug"
 
 # only EdDSA keys are supported
 # only pkce8 format supported
-[jwks]
+[jwt]
 iss = "https://auth.example.com"
-aud = "AllForOne-Project-Service"
+aud = "SomethingAboutUs-Project-Service"
 keys_path = "./jwks"
-
-# if kid's key not exist, it will be generated automatically
-[[jwks.keys]]
+access_token_ttl = 86400                 # 24 hours in seconds
+[[jwt.keys]]
 kid = "13f03b9f-f209-4dcd-86f0-69cc19e773eb"
 
 [oidc]
 [oidc.github]
-client_id = "fg8dh798dh79dh78"
-client_secret = "fd8976h8df6h7f98dh798df7h98dfh79dfh8"
+client_id = "98sdgfg89f7gfdjh"
+client_secret = "jkshgs8dfg6789ujhgsdj23j4jklk"
 resource_url = "https://api.github.com"
 auth_url = "https://github.com/login/oauth/authorize"
 token_url = "https://github.com/login/oauth/access_token"
@@ -53,19 +52,6 @@ redirect_url = "http://127.0.0.1:3000/api/v1/oauth/github/callback"
 
 # Security Configuration
 [security]
-
-# JWT Security Settings
-[security.jwt]
-access_token_ttl = 900          # 15 minutes in seconds
-aud = "AllForOne-Project-Service"
-issuer = "https://auth.example.com"
-
-# refresh token and rotate not suopported yet
-refresh_token_ttl = 86400       # 24 hours in seconds
-key_rotation_interval = 2592000 # 30 days in seconds
-
-# only EdDSA keys are supported
-algorithm = "EdDSA"
 
 # Session Security Settings
 [security.session]
