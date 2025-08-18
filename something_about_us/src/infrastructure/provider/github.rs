@@ -10,14 +10,11 @@ use url::Url;
 use uuid::Uuid;
 
 use crate::{
-    domain::{
-        idp::supported_idp::SupportIdp,
-        oauth::{
-            auth_session::{AuthSession, AUTH_HTTP_AGENT_NAME},
-            error::SAUOAuthDomainError,
-            oauth_provider::{get_oauth_redirect_url, OAuthRequest},
-            sau_jwt::OAuthAccessToken,
-        },
+    domain::oauth::{
+        auth_session::{AuthSession, AUTH_HTTP_AGENT_NAME},
+        error::SAUOAuthDomainError,
+        oauth_provider::OAuthRequest,
+        sau_jwt::OAuthAccessToken,
     },
     infrastructure::config::types::GithubConfig,
 };
@@ -56,7 +53,7 @@ impl From<&GithubConfig> for GithubOAuthClient {
             .expect("invalid github authorization endpoint url");
         let token_url =
             TokenUrl::new(value.token_url.clone()).expect("invalid github token endpoint url");
-        let redirect_url = get_oauth_redirect_url(SupportIdp::Github);
+        let redirect_url = value.redirect_url.clone();
 
         let auth_client = BasicClient::new(idp_id)
             .set_client_secret(idp_secret)
