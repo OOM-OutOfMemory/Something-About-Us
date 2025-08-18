@@ -3,6 +3,7 @@ use axum::{
     response::{IntoResponse, Redirect, Response},
 };
 use axum_extra::extract::CookieJar;
+use utoipa::OpenApi;
 
 use crate::{
     application::{
@@ -12,9 +13,28 @@ use crate::{
     infrastructure::{
         cache::memcached::repository::CacheRepoMchd, cookie::AuthSessionCookieIssuer,
     },
-    interface::web::{error::WebError, state::auth_session_cookie::AuthSessionCookieManager},
+    interface::web::{
+        dto::idp_path::IdpPathParam, error::WebError,
+        state::auth_session_cookie::AuthSessionCookieManager,
+    },
 };
 
+#[utoipa::path(
+    get,
+    path = "/api/v1/oauth/{idp}/login",
+    tag = "OAuth",
+    operation_id = "oauthLogin",
+    params(IdpPathParam),
+    responses(
+        (status = 302, description = "Redirect to Identity Provider for authentication",
+            headers(
+                ("Set-Cookie" = String, description = "Auth session cookie"),
+                ("Location" = String, description = "Redirect target URL to the IdP")
+            )
+        ),
+        (status = 500, description = "Internal Server Error", body = crate::interface::web::dto::error_response::ErrorResponse)
+    )
+)]
 pub async fn login(
     path: Result<Path<SupportIdp>, PathRejection>,
     State(oauth_service): State<OAuthService>,
@@ -42,4 +62,12 @@ pub async fn login(
         Redirect::to(authenticate_redirect_url.to_string().as_str()),
     )
         .into_response())
+}
+
+#[derive(OpenApi)]
+#[openapi(paths(login), components(schemas(IdpPathParam)))]
+struct LoginOpenApi;
+
+pub fn gen_openapi_login() -> utoipa::openapi::OpenApi {
+    LoginOpenApi::openapi()
 }

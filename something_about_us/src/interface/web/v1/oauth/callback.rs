@@ -6,6 +6,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use axum_extra::extract::CookieJar;
+use utoipa::OpenApi;
 use uuid::Uuid;
 
 use crate::{
@@ -24,11 +25,30 @@ use crate::{
         persistence::postgres::repository::DatabaseRepoPg,
     },
     interface::web::{
-        dto::{callback_param::OAuthCallbackQuery, jwt_response::Token},
+        dto::{
+            callback_param::OAuthCallbackQuery, error_response::ErrorResponse,
+            idp_path::IdpPathParam, jwt_response::Token,
+        },
         error::WebError,
     },
 };
 
+#[utoipa::path(
+    get,
+    path = "/api/v1/oauth/{idp}/callback",
+    tag = "OAuth",
+    operation_id = "oauthCallback",
+    params(
+        IdpPathParam,
+        OAuthCallbackQuery
+    ),
+    responses(
+        (status = 200, description = "Login complete. JWT access token issued", body = Token),
+        (status = 400, description = "Invalid input", body = ErrorResponse),
+        (status = 401, description = "Unauthorized", body = ErrorResponse),
+        (status = 500, description = "Internal Server Error", body = ErrorResponse)
+    )
+)]
 pub async fn callback(
     path: Result<Path<SupportIdp>, PathRejection>,
     query: Result<Query<OAuthCallbackQuery>, QueryRejection>,
@@ -88,4 +108,15 @@ pub async fn callback(
         ),
     )
         .into_response())
+}
+
+#[derive(OpenApi)]
+#[openapi(
+    paths(callback),
+    components(schemas(Token, IdpPathParam, OAuthCallbackQuery))
+)]
+struct CallbackOpenApi;
+
+pub fn gen_openapi_callback() -> utoipa::openapi::OpenApi {
+    CallbackOpenApi::openapi()
 }
