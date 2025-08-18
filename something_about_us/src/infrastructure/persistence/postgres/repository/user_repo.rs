@@ -1,4 +1,4 @@
-use sea_orm::{ActiveModelTrait, ActiveValue::Set, ColumnTrait, EntityTrait, QueryFilter};
+use sea_orm::{ActiveValue::Set, ColumnTrait, EntityTrait, QueryFilter, TryInsertResult};
 use uuid::Uuid;
 
 use crate::{
@@ -46,11 +46,26 @@ impl SAUUserRepo for DatabaseRepoPg {
             created_at: Set(now),
             updated_at: Set(now),
         };
-        Ok(new_user
-            .insert(&self.conn)
+
+        let result = users::Entity::insert(new_user)
+            .do_nothing()
+            .exec_with_returning(&self.conn)
             .await
-            .map_err(|e| SAUUserRepoError::DatabaseError(e.to_string()))
-            .and_then(|user| SAUUser::try_from(user))?)
+            .map_err(|e| SAUUserRepoError::DatabaseError(e.to_string()))?;
+
+        if let TryInsertResult::Inserted(model) = result {
+            return SAUUser::try_from(model)
+                .map_err(|e| SAUUserRepoError::CastingError(e.to_string()));
+        }
+
+        let search = self.get_user_by_idp_and_idp_id(idp, idp_id).await?;
+
+        match search {
+            Some(user) => Ok(user),
+            None => Err(SAUUserRepoError::DatabaseError(
+                "failed to create user".to_string(),
+            )),
+        }
     }
 }
 

@@ -18,7 +18,7 @@ impl AuthSessionCacheRepo for CacheRepoMchd {
             .set(
                 auth_session.id.to_string(),
                 body.to_string(),
-                Some(15),
+                Some(500),
                 None,
             )
             .await
