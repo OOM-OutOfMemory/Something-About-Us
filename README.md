@@ -1,6 +1,6 @@
 # Something About Us
 
-This is simple web application providing user management system with OAuth2/OIDC authentication and JWT token-based authorization.   
+This is simple web application providing user management system with OAuth2/OIDC authentication and JWT token-based authorization.
 Integrate multiple IdPs and service one server.
 
 ## Project Structure
@@ -89,7 +89,7 @@ graph RL
     subgraph "Web Application Server"
         direction LR
         WebApp["Rust Web Server (Axum)"]
-        
+
         subgraph "Data Stores"
             Database["🗄️ PostgreSQL (User Data)"]
             Cache["⚡ Memcached (OAuth Session)"]
@@ -193,6 +193,8 @@ sequenceDiagram
 - **JWT Algorithm Support**: Expand beyond Ed25519 to support additional signing algorithms
 
 ### Additional Features
+- **Some Configurations hard coding and not support**: Add more configuration options (e.g., OAuth scopes, token TTLs)
+- **Logging & Monitoring**: Integrate logging and monitoring tools (e.g., Prometheus, Grafana)
 - **Multi-IdP Support**: Extend OAuth support to additional identity providers
 - **Rate Limiting**: Implement API rate limiting for better resource protection
 - **User Profile Management**: Add user profile update and management capabilities
