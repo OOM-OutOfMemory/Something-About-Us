@@ -1,57 +1,19 @@
 # Something About Us
 
-A Rust web application providing user management system with OAuth authentication and JWT token-based authorization.
+This is simple web application providing user management system with OAuth2/OIDC authentication and JWT token-based authorization.   
+Integrate multiple IdPs and service one server.
 
-## Features
+## Project Structure
 
-- **OAuth Authentication**: User authentication via GitHub OAuth
-- **JWT Tokens**: Secure JWT token issuance and verification using EdDSA keys
-- **User Management**: PostgreSQL-based user data management
-- **Session Management**: Session caching with Memcached
-- **RESTful API**: Web API built with Axum framework
-- **API Documentation**: API documentation via Swagger UI
-
-## Tech Stack
-
-- **Language**: Rust (Edition 2021)
-- **Web Framework**: Axum
-- **Database**: PostgreSQL (SeaORM)
-- **Cache**: Memcached
-- **Authentication**: OAuth2, JWT (EdDSA)
-- **Containerization**: Docker & Docker Compose
-
-## Getting Started
-
-### Prerequisites
-
-- Rust 1.70+
-- Docker & Docker Compose
-- PostgreSQL
-- Memcached
-
-### Installation & Running
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd something_about_us
-   ```
-
-2. **Setup configuration**
-   ```bash
-   cp config.toml.example config.toml
-   ```
-
-3. **Run with Docker Compose**
-   ```bash
-   docker-compose up -d
-   ```
-
-4. **Run in local development**
-   ```bash
-   cargo run --bin migration
-   cargo run --bin something_about_us
-   ```
+```
+├── migration/          # Database migrations
+├── something_about_us/ # Main application
+├── jwks/              # JWT key storage
+├── config.toml        # Configuration file
+├── dockerfile # Docker build file
+├── docker-compose.infra.yaml # Docker infra only compose
+└── docker-compose.yaml # Docker compose
+```
 
 ### Configuration
 
@@ -64,6 +26,44 @@ Configure the following in `config.toml`:
 - **OAuth**: GitHub OAuth client credentials
 - **Security**: Session cookie settings
 
+## Getting Started
+
+### Prerequisites
+
+- Docker & Docker Compose
+- PostgreSQL
+- Memcached
+
+### Installation & Running
+
+1. **Setup configuration**
+   ```bash
+   # place in project bin or root project directory
+   config.toml
+   ```
+
+2. **Setup infrastructure**
+   ```bash
+   # start the infrastructure
+   docker-compose -f docker-compose-infra.yaml up -d
+   ```
+
+3. **Migrate database**
+   ```bash
+   # install sea-orm-cli
+   cargo install sea-orm-cli
+   # migrate
+   sea-orm-cli migrate up
+   ```
+   >> sea-orm-cli needs database connection info
+
+4. **Run application**
+   ```bash
+   # default is something_about_us
+   cargo run
+   ```
+
+
 ## API Documentation
 
 Access Swagger UI at:
@@ -72,36 +72,127 @@ Access Swagger UI at:
 http://localhost:3000/swagger-ui/
 ```
 
-## Development
 
-### Run tests
+## Tech Stack
 
-```bash
-cargo test
+- **Language**: Rust (Edition 2021)
+- **Web Framework**: Axum
+- **Database**: PostgreSQL (SeaORM)
+- **Cache**: Memcached
+- **Authentication**: OAuth2, JWT (EdDSA)
+- **Containerization**: Docker & Docker Compose
+
+### Infrastructure
+
+```mermaid
+graph RL
+    subgraph "Web Application Server"
+        direction LR
+        WebApp["Rust Web Server (Axum)"]
+        
+        subgraph "Data Stores"
+            Database["🗄️ PostgreSQL (User Data)"]
+            Cache["⚡ Memcached (OAuth Session)"]
+        end
+
+        WebApp -- "Read/Write User Info" --- Database
+        WebApp -- "Store/Load Temp Session" --- Cache
+    end
+
+    subgraph External_Identity_Providers
+        GitHub["🌐 GitHub API"]
+        IdP["... etc ..."]
+    end
+
+    User --- WebApp
+    WebApp --- External_Identity_Providers
 ```
 
-### Format code
+### Design Pattern
 
-```bash
-cargo fmt
+Try to adjust [hexagonal architecture](https://en.wikipedia.org/wiki/Hexagonal_architecture_(software)).
+
+```mermaid
+graph LR
+    subgraph Infra
+        direction LR
+        memcached
+        postgres
+    end
+
+    subgraph Domain
+        direction LR
+        model
+        model_service[model service]
+    end
+
+    subgraph Application
+        direction LR
+        Repository
+        Service
+    end
+
+    subgraph Interface
+        web
+    end
+
+
+    Infra --> Domain
+    Domain --> Application
+    Application --> Interface
 ```
 
-### Lint code
+## Features
 
-```bash
-cargo clippy
+- **OAuth Authentication**: User authentication via GitHub OAuth
+- **JWT Tokens**: Secure JWT token issuance and verification using EdDSA keys
+- **User Management**: PostgreSQL-based user data management
+- **Session Management**: Session caching with Memcached
+- **RESTful API**: Web API built with Axum framework
+- **API Documentation**: API documentation via Swagger UI
+
+### Technical Notes
+
+- **JWT Secret Generation**: Automatically generates JWT secret if not found
+- **EdDSA Support**: Only supports Ed25519 algorithm for JWT signing
+- **Validation**: Temporary validation rules (username max 50 bytes, config details, etc.)
+- **Type Dependencies**: Crate types are coupled with dependencies (uuid, jsonwebtoken, url, etc.)
+- **Test Coverage**: Test code generated by AI
+
+
+### Support IdP (OAuth2.0 / OIDC)
+
+- GitHub
+
+### Auth Flow
+
+```mermaid
+sequenceDiagram
+    participant U as User / Frontend
+    participant C as Client / Backend
+    participant O as OAuth / IdP
+
+    U ->>+ C : login request
+    C -->>- U :response redirect url <br/> with session id, csrf token, pkce challenge
+    U ->>+ O : authenticate
+    O -->>- U : response state(csrf token), code(authorize code)
+    U ->>+ C : callback with session id, state, code
+    C ->>+ O : authorize with code, pkce verifier, scope
+    O -->>- C : response access token(jwt)
+    C ->>+ O : request user id with IdP access token
+    O -->>- C : user id
+    C -->> C : search in this server db and select or create user
+    C -->>- U : request user access token (jwt)
 ```
+## Future Improvements
 
-## Project Structure
+### Security Enhancements
+- **JWKS Rotation**: Implement automatic JWT key rotation for enhanced security
+- **Security Headers**: Add comprehensive security headers (CORS, CSP, HSTS, etc.)
+- **OAuth Token Revocation**: Add token revocation functionality for secure logout
+- **JWT Algorithm Support**: Expand beyond Ed25519 to support additional signing algorithms
 
-```
-├── migration/          # Database migrations
-├── something_about_us/ # Main application
-├── jwks/              # JWT key storage
-├── config.toml        # Configuration file
-└── docker-compose.yaml # Docker configuration
-```
-
-## License
-
-This project is distributed under the MIT License.
+### Additional Features
+- **Multi-IdP Support**: Extend OAuth support to additional identity providers
+- **Rate Limiting**: Implement API rate limiting for better resource protection
+- **User Profile Management**: Add user profile update and management capabilities
